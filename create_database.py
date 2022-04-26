@@ -1,3 +1,4 @@
+from calendar import c
 import mysql.connector
 from mysql.connector import errorcode
 
@@ -11,7 +12,7 @@ def create_database(cursor, DB_NAME):
 
 
 def create_table_players(cursor):
-    create_species = '''CREATE TABLE players (
+    create_players = '''CREATE TABLE players (
         player_id int NOT NULL AUTO_INCREMENT,
         name nvarchar(100) NOT NULL,
         nickname nvarchar(100) NOT NULL,
@@ -24,7 +25,7 @@ def create_table_players(cursor):
 
     try:
         print("Created table players")
-        cursor.execute(create_species)
+        cursor.execute(create_players)
     except mysql.connector.Error as err:
         if err.errno == errorcode.ER_TABLE_EXISTS_ERROR:
             print("Table players already exists")
@@ -33,7 +34,7 @@ def create_table_players(cursor):
 
 
 def create_table_coaches(cursor):
-    create_species = '''CREATE TABLE coaches (
+    create_coaches = '''CREATE TABLE coaches (
         coach_id int NOT NULL AUTO_INCREMENT,
         name nvarchar(100) NOT NULL,
         nickname nvarchar(100) NOT NULL,
@@ -45,7 +46,7 @@ def create_table_coaches(cursor):
 
     try:
         print("Created table coaches")
-        cursor.execute(create_species)
+        cursor.execute(create_coaches)
     except mysql.connector.Error as err:
         if err.errno == errorcode.ER_TABLE_EXISTS_ERROR:
             print("Table coaches already exists")
@@ -54,15 +55,16 @@ def create_table_coaches(cursor):
 
 
 def create_table_teams(cursor):
-    create_species = '''CREATE TABLE teams (
+    create_teams = '''CREATE TABLE teams (
         team_id int NOT NULL AUTO_INCREMENT,
         name nvarchar(100) NOT NULL,
+        color nvarchar(10) NOT NULL,
         PRIMARY KEY (team_id)
         )'''
 
     try:
         print("Created table teams")
-        cursor.execute(create_species)
+        cursor.execute(create_teams)
     except mysql.connector.Error as err:
         if err.errno == errorcode.ER_TABLE_EXISTS_ERROR:
             print("Table teams already exists")
@@ -118,19 +120,34 @@ def insert_into_coaches(cursor, cnx):
 
 def insert_into_teams(cursor, cnx):
     queries = [
-        ('Fnatic',),
-        ('NIP',),
-        ('Natus Vincere',)
+        ('Fnatic', 'FF5900'),
+        ('NIP', 'D8FF00'),
+        ('Natus Vincere', 'FFEE00',)
     ]
     
     for query in queries:
         try:
-            cursor.execute("INSERT INTO teams (name) VALUES (%s)", query)
+            cursor.execute("INSERT INTO teams (name, color) VALUES (%s, %s)", query)
         except mysql.connector.Error as err:
             print(err.msg)
         else:
             cnx.commit()
             print(f"Inserted data into teams")
+
+
+def create_players_teams(cursor):
+    create_players_teams = '''
+        CREATE VIEW players_teams
+        AS SELECT players.nickname, players.age, players.nationality, players.hltv_rating, teams.name
+        FROM players, teams
+        WHERE players.team_id = teams.team_id
+        '''
+
+    try:
+        print("Created view players and teams")
+        cursor.execute(create_players_teams)
+    except mysql.connector.Error as err:
+        print(err.msg)
 
 
 def start(cursor, cnx):
@@ -148,3 +165,4 @@ def start(cursor, cnx):
             insert_into_coaches(cursor, cnx)
             create_table_teams(cursor)
             insert_into_teams(cursor, cnx)
+            create_players_teams(cursor)

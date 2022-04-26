@@ -1,3 +1,4 @@
+from tokenize import blank_re
 import mysql.connector
 from mysql.connector import errorcode
 import PySimpleGUI as sg
@@ -9,23 +10,167 @@ cursor = cnx.cursor()
 
 cb.start(cursor, cnx)
 
-layout = [
 
-]
+def show_player(cursor, player):
+    layout = []
 
-dd.get_team_players(cursor, "Fnatic")
+    dd.get_player(cursor, player)
 
-for item in cursor:
-    player = []
-    for value in item:
-        player.append(sg.Text(value))
-    layout.append(player)
+    cols = ["Name", "Nickname", "Age", "Nationality", "Rating", "Team"]
+    columns = []
+    for c in cols:
+        columns.append(sg.Text(c, size=(10,1), justification="center", pad=(4, 1), text_color="#000000"))
+    layout.append(columns)
 
-window = sg.Window('Window Title', layout)
+    for p in cursor:
+        nationality = p[3]
 
-while True:
-    event, values = window.read()
-    if event == sg.WIN_CLOSED:
-        break
+        players = []
+        for value in p:
+            players.append(sg.Button(value, size=(10, 2), pad=(2, 1), button_color=("#000000", "#FFFFFF")))
+        layout.append(players)
 
-window.close()
+    window = sg.Window(player, layout)
+
+    while True:
+        event, values = window.read()
+        if event == sg.WIN_CLOSED:
+            break
+        
+    window.close()
+
+
+
+    
+
+def show_team(cursor, team):
+    color = dd.get_team_color(cursor, team)
+
+    layout = [[sg.Text(team, size=(22,0), justification="center", pad=(6, 1), font=("Arial", 20), background_color=color, text_color="#000000")]]
+
+    dd.get_team_players(cursor, team)
+
+    cols = ["Nickname", "Age", "Nationality", "Rating"]
+    columns = []
+    for c in cols:
+        columns.append(sg.Text(c, size=(10,1), justification="center", pad=(4, 1), background_color=color, text_color="#000000"))
+    layout.append(columns)
+
+    nicknames = []
+    ages = []
+    nationalities = []
+    ratings = []
+
+    for p in cursor:
+        nicknames.append(p[0])
+        ages.append(p[1])
+        nationalities.append(p[2])
+        ratings.append(p[3])
+
+        player = []
+        for value in p:
+            player.append(sg.Button(value, size=(10, 2), pad=(2, 1), button_color=("#000000", "#FFFFFF")))
+        layout.append(player)
+
+    window = sg.Window(team, layout, background_color=color)
+
+    while True:
+        event, values = window.read()
+        if event == sg.WIN_CLOSED:
+            break
+        
+    window.close()
+
+
+def show_teams(cursor):
+    layout = []
+
+    dd.get_teams(cursor)
+
+    teams = []
+
+    for t in cursor:
+        teams.append(t[0])
+
+        team = []
+        for value in t:
+            team.append(sg.Button(value, size=(15, 0), pad=(2, 1)))
+        layout.append(team)
+    
+    window = sg.Window("Teams", layout, background_color="#FFFFFF")
+
+    while True:
+        event, values = window.read()
+        if event == sg.WIN_CLOSED:
+            break
+        if event in teams:
+            show_team(cursor, event)
+        
+    window.close()
+
+
+def show_players(cursor):
+    layout = []
+
+    dd.get_players(cursor)
+
+    cols = ["Nickname", "Age", "Nationality", "Rating", "Team"]
+    columns = []
+    for c in cols:
+        columns.append(sg.Text(c, size=(10,1), justification="center", pad=(4, 1), text_color="#000000"))
+    layout.append(columns)
+
+    nicknames = []
+    ages = []
+    nationalities = []
+    ratings = []
+    teams = []
+
+    for p in cursor:
+        nicknames.append(p[0])
+        ages.append(p[1])
+        nationalities.append(p[2])
+        ratings.append(p[3])
+        teams.append(p[4])
+
+        player = []
+        for value in p:
+            player.append(sg.Button(value, size=(10, 2), pad=(2, 1), button_color=("#000000", "#FFFFFF")))
+        layout.append(player)
+
+    window = sg.Window("Players", layout)
+
+    while True:
+        event, values = window.read()
+        if event == sg.WIN_CLOSED:
+            break
+        if event in nicknames:
+            show_player(cursor, event)
+        
+    window.close()
+
+
+def main(cursor):
+    layout = [
+        [sg.Button("Teams", size=(10, 2), pad=(2, 1))],
+        [sg.Button("Players", size=(10, 2), pad=(2, 1))]
+    ]
+
+    window = sg.Window("Counter-Strike: Global Offensive", layout)
+
+    while True:
+        event, values = window.read()
+        if event == sg.WIN_CLOSED:
+            break
+        if event == "Teams":
+            show_teams(cursor)
+        if event == "Players":
+            show_players(cursor)
+        
+    window.close()
+
+
+main(cursor)
+
+cursor.close()
+cnx.close()
