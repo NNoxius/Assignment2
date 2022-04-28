@@ -11,6 +11,33 @@ cursor = cnx.cursor()
 cb.start(cursor, cnx)
 
 
+def show_nationality(cursor, nationality):
+    layout = []
+
+    dd.get_nationality(cursor, nationality)
+
+    cols = ["Name", "Nickname", "Age", "Nationality", "Rating", "Team"]
+    columns = []
+    for c in cols:
+        columns.append(sg.Text(c, size=(10,1), justification="center", pad=(4, 1), text_color="#000000"))
+    layout.append(columns)
+
+    for p in cursor:
+        players = []
+        for value in p:
+            players.append(sg.Button(value, size=(10, 2), pad=(2, 1), button_color=("#000000", "#FFFFFF")))
+        layout.append(players)
+
+    window = sg.Window(nationality, layout)
+
+    while True:
+        event, values = window.read()
+        if event == sg.WIN_CLOSED:
+            break
+    
+    window.close()
+
+
 def show_player(cursor, player):
     layout = []
 
@@ -23,8 +50,6 @@ def show_player(cursor, player):
     layout.append(columns)
 
     for p in cursor:
-        nationality = p[3]
-
         players = []
         for value in p:
             players.append(sg.Button(value, size=(10, 2), pad=(2, 1), button_color=("#000000", "#FFFFFF")))
@@ -40,9 +65,6 @@ def show_player(cursor, player):
     window.close()
 
 
-
-    
-
 def show_team(cursor, team):
     color = dd.get_team_color(cursor, team)
 
@@ -56,16 +78,16 @@ def show_team(cursor, team):
         columns.append(sg.Text(c, size=(10,1), justification="center", pad=(4, 1), background_color=color, text_color="#000000"))
     layout.append(columns)
 
-    nicknames = []
-    ages = []
-    nationalities = []
-    ratings = []
+    nicknames = set()
+    ages = set()
+    nationalities = set()
+    ratings = set()
 
     for p in cursor:
-        nicknames.append(p[0])
-        ages.append(p[1])
-        nationalities.append(p[2])
-        ratings.append(p[3])
+        nicknames.add(p[0])
+        ages.add(p[1])
+        nationalities.add(p[2])
+        ratings.add(p[3])
 
         player = []
         for value in p:
@@ -87,10 +109,10 @@ def show_teams(cursor):
 
     dd.get_teams(cursor)
 
-    teams = []
+    teams = set()
 
     for t in cursor:
-        teams.append(t[0])
+        teams.add(t[0])
 
         team = []
         for value in t:
@@ -120,18 +142,18 @@ def show_players(cursor):
         columns.append(sg.Text(c, size=(10,1), justification="center", pad=(4, 1), text_color="#000000"))
     layout.append(columns)
 
-    nicknames = []
-    ages = []
-    nationalities = []
-    ratings = []
-    teams = []
+    nicknames = set()
+    ages = set()
+    nationalities = set()
+    ratings = set()
+    teams = set()
 
     for p in cursor:
-        nicknames.append(p[0])
-        ages.append(p[1])
-        nationalities.append(p[2])
-        ratings.append(p[3])
-        teams.append(p[4])
+        nicknames.add(p[0])
+        ages.add(p[1])
+        nationalities.add(p[2])
+        ratings.add(p[3])
+        teams.add(p[4])
 
         player = []
         for value in p:
@@ -146,6 +168,9 @@ def show_players(cursor):
             break
         if event in nicknames:
             show_player(cursor, event)
+        if event in nationalities:
+            show_nationality(cursor, event)
+        print(event)
         
     window.close()
 

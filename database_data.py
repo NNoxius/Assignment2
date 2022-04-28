@@ -1,7 +1,3 @@
-import mysql.connector
-from mysql.connector import errorcode
-
-
 def get_team_players(cursor, team):
     query = f"SELECT nickname, age, nationality, hltv_rating FROM players, teams WHERE players.team_id = teams.team_id AND teams.name = '{team}';"
     cursor.execute(query)
@@ -32,5 +28,10 @@ def get_players(cursor):
 
 
 def get_player(cursor, player):
-    query = f"SELECT players.name, nickname, age, nationality, hltv_rating, teams.name FROM players JOIN teams on players.team_id = teams.team_id WHERE players.name = '{player}';"
+    query = f"SELECT players.name, nickname, age, nationality, hltv_rating, teams.name FROM players INNER JOIN teams ON players.team_id = teams.team_id WHERE nickname = '{player}';"
+    cursor.execute(query)
+
+
+def get_nationality(cursor, nationality):
+    query = f"SELECT players.name, nickname, age, nationality, hltv_rating, teams.name FROM players INNER JOIN teams ON players.team_id = teams.team_id WHERE nationality = '{nationality}';"
     cursor.execute(query)
