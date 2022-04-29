@@ -18,7 +18,7 @@ def create_table_players(cursor):
         nickname nvarchar(100) NOT NULL,
         age int NOT NULL,
         nationality nvarchar(100) NOT NULL,
-        hltv_rating float(3,2),
+        rating float(3,2),
         team_id int,
         PRIMARY KEY (player_id)
         )'''
@@ -93,7 +93,7 @@ def insert_into_players(cursor, cnx):
 
     for query in queries:
         try:
-            cursor.execute("INSERT INTO players (name, nickname, age, nationality, hltv_rating, team_id) VALUES (%s, %s, %s, %s, %s, %s)", query)
+            cursor.execute("INSERT INTO players (name, nickname, age, nationality, rating, team_id) VALUES (%s, %s, %s, %s, %s, %s)", query)
         except mysql.connector.Error as err:
             print(err.msg)
         else:
@@ -138,7 +138,7 @@ def insert_into_teams(cursor, cnx):
 def create_players_teams(cursor):
     create_players_teams = '''
         CREATE VIEW players_teams
-        AS SELECT players.nickname, players.age, players.nationality, players.hltv_rating, teams.name
+        AS SELECT players.nickname, players.age, players.nationality, players.rating, teams.name
         FROM players, teams
         WHERE players.team_id = teams.team_id
         '''
