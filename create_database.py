@@ -23,7 +23,8 @@ def create_table_players(cursor):
         nationality nvarchar(100) NOT NULL,
         rating float(3,2),
         team_id int,
-        PRIMARY KEY (player_id)
+        PRIMARY KEY (player_id),
+        FOREIGN KEY (team_id) REFERENCES teams(team_id)
         )'''
 
     try:
@@ -45,7 +46,8 @@ def create_table_coaches(cursor):
         age int NOT NULL,
         nationality nvarchar(100) NOT NULL,
         team_id int,
-        PRIMARY KEY (coach_id)
+        PRIMARY KEY (coach_id),
+        FOREIGN KEY (team_id) REFERENCES teams(team_id)
         )'''
 
     try:
@@ -169,10 +171,10 @@ def start(cursor, cnx):
             create_database(cursor, DB_NAME)
             print(f"Created database {DB_NAME}")
             cnx.database = DB_NAME
+            create_table_teams(cursor)
+            insert_into_teams(cursor, cnx)
             create_table_players(cursor)
             insert_into_players(cursor, cnx)
             create_table_coaches(cursor)
             insert_into_coaches(cursor, cnx)
-            create_table_teams(cursor)
-            insert_into_teams(cursor, cnx)
             create_players_teams(cursor)
