@@ -4,6 +4,8 @@ from mysql.connector import errorcode
 
 DB_NAME = "CSGO"
 
+
+# Create database
 def create_database(cursor, DB_NAME):
     try:
         cursor.execute(f"CREATE DATABASE {DB_NAME} DEFAULT CHARACTER SET 'utf8'")
@@ -11,6 +13,7 @@ def create_database(cursor, DB_NAME):
         print(f"Could not create database {DB_NAME}")
 
 
+# Create players table
 def create_table_players(cursor):
     create_players = '''CREATE TABLE players (
         player_id int NOT NULL AUTO_INCREMENT,
@@ -33,6 +36,7 @@ def create_table_players(cursor):
             print(err.msg)
 
 
+# Create coaches table
 def create_table_coaches(cursor):
     create_coaches = '''CREATE TABLE coaches (
         coach_id int NOT NULL AUTO_INCREMENT,
@@ -54,6 +58,7 @@ def create_table_coaches(cursor):
             print(err.msg)
 
 
+# Create teams table
 def create_table_teams(cursor):
     create_teams = '''CREATE TABLE teams (
         team_id int NOT NULL AUTO_INCREMENT,
@@ -72,6 +77,7 @@ def create_table_teams(cursor):
             print(err.msg)
 
 
+# Insert values into players table
 def insert_into_players(cursor, cnx):
     queries = [
         ('Freddy Johansson', 'KRIMZ', '27', 'Sweden', '1.09', '1'),
@@ -101,6 +107,7 @@ def insert_into_players(cursor, cnx):
             print(f"Inserted data into players")
 
 
+# Insert values into coaches table
 def insert_into_coaches(cursor, cnx):
     queries = [
         ('Jamie Hall', 'keita', '29', 'United Kingdom', '1'),
@@ -118,6 +125,7 @@ def insert_into_coaches(cursor, cnx):
             print(f"Inserted data into coaches")
 
 
+# Insert values into teams table
 def insert_into_teams(cursor, cnx):
     queries = [
         ('Fnatic', 'FF5900'),
@@ -135,6 +143,7 @@ def insert_into_teams(cursor, cnx):
             print(f"Inserted data into teams")
 
 
+# Create view for players and corresponding team
 def create_players_teams(cursor):
     create_players_teams = '''
         CREATE VIEW players_teams
@@ -150,6 +159,7 @@ def create_players_teams(cursor):
         print(err.msg)
 
 
+# Use database and create if not present
 def start(cursor, cnx):
     try:
         cursor.execute(f"USE {DB_NAME}")
